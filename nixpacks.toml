@@ -1,6 +1,13 @@
+[phases.setup]
+nixPkgs = ["php82", "php82Extensions.pdo", "php82Extensions.pdo_sqlite", "php82Extensions.sqlite3", "php82Extensions.mbstring", "php82Extensions.tokenizer", "php82Extensions.xml", "php82Extensions.ctype", "php82Extensions.fileinfo", "php82Extensions.curl", "php82Extensions.openssl", "composer"]
+
+[phases.install]
+cmds = [
+  "composer install --no-dev --optimize-autoloader --no-interaction"
+]
+
 [phases.build]
 cmds = [
-  "composer install --no-dev --optimize-autoloader",
   "php artisan config:cache",
   "php artisan route:cache",
   "php artisan view:cache"
@@ -8,8 +15,9 @@ cmds = [
 
 [phases.deploy]
 cmds = [
-  "mkdir -p database",
+  "mkdir -p database storage/framework/sessions storage/framework/views storage/framework/cache storage/logs bootstrap/cache",
   "touch database/database.sqlite",
+  "chmod -R 775 storage bootstrap/cache",
   "php artisan migrate --force",
   "php artisan db:seed --force"
 ]
