@@ -23,7 +23,7 @@ dependsOn = ["install"]
 cmds = [
   "mkdir -p database storage/framework/sessions storage/framework/views storage/framework/cache storage/logs bootstrap/cache",
   "touch database/database.sqlite",
-  "chmod -R 775 storage bootstrap/cache",
+  "chmod -R 777 storage bootstrap/cache database",
   "php artisan config:cache",
   "php artisan route:cache",
   "php artisan view:cache",
@@ -32,4 +32,4 @@ cmds = [
 ]
 
 [start]
-cmd = "php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"
+cmd = "php -S 0.0.0.0:${PORT:-8000} -t public public/index.php"
