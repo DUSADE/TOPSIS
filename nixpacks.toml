@@ -12,26 +12,24 @@ nixPkgs = [
   "php82Extensions.curl",
   "php82Extensions.openssl"
 ]
-nixLibs = []
 
 [phases.install]
 cmds = [
-  "curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer",
-  "composer install --no-dev --optimize-autoloader --no-interaction"
+  "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\"",
+  "php composer-setup.php --install-dir=/usr/local/bin --filename=composer",
+  "php -r \"unlink('composer-setup.php');\"",
+  "composer install --no-dev --optimize-autoloader --no-interaction --no-scripts"
 ]
 
 [phases.build]
-cmds = [
-  "php artisan config:cache",
-  "php artisan route:cache",
-  "php artisan view:cache"
-]
-
-[phases.deploy]
+dependsOn = ["install"]
 cmds = [
   "mkdir -p database storage/framework/sessions storage/framework/views storage/framework/cache storage/logs bootstrap/cache",
   "touch database/database.sqlite",
   "chmod -R 775 storage bootstrap/cache",
+  "php artisan config:cache",
+  "php artisan route:cache",
+  "php artisan view:cache",
   "php artisan migrate --force",
   "php artisan db:seed --force"
 ]
